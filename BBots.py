@@ -55,12 +55,12 @@ class BotApp(ctk.CTk):
         self.queue = queue.Queue()
         self.command_buttons = {}
         self.bot_token = ""
-        self.bot_saved = True  # Изначально считаем, что бот сохранен
+        self.bot_saved = True
         self.current_view = "main"
         self.testmenu = None
         self.chat_messages = []
 
-        # =main menu
+        
         self.bot_frame = None
         self.token_input = None
         self.start_stop_button = None
@@ -83,7 +83,7 @@ class BotApp(ctk.CTk):
         self.console_output = None
         self.add_button = None
 
-        # Теstovoye window
+        
         self.test_chat_frame = None
         self.chat_area = None
         self.chat_input_frame = None
@@ -100,14 +100,14 @@ class BotApp(ctk.CTk):
     def create_menu(self):
         self.menubar = Menu(self)
 
-        # File menu
+        
         filemenu = Menu(self.menubar, tearoff=0)
         filemenu.add_command(label="Сохранить как", command=self.save_bot)
         filemenu.add_command(label="Открыть", command=self.load_bot)
         filemenu.add_command(label="Удалить", command=self.remove_bot)
         self.menubar.add_cascade(label="Файл", menu=filemenu)
 
-        # Code menu
+        
         self.code_menu = Menu(self.menubar, tearoff=0)
         self.code_menu.add_command(label="Код", command=self.toggle_code_view)
         self.menubar.add_cascade(label="Код", menu=self.code_menu)
@@ -118,32 +118,32 @@ class BotApp(ctk.CTk):
         self.show_code_view()
 
     def show_code_view(self):
-        # Создание нового окна для отображения кода
+        
         code_window = Toplevel(self)
         code_window.title("Код бота")
         code_window.geometry("900x600")
 
-        # Создание текстового поля для отображения кода
+        
         code_text = Text(code_window, bg="#212325", fg="white", bd=0, wrap="word", font=("Consolas", 10), highlightthickness=0)
         code_text.pack(side="left", fill="both", expand=True, padx=10, pady=10)
 
-        # Scrollbar для кода
+        
         code_scroll = Scrollbar(code_window, command=code_text.yview)
         code_scroll.pack(side="right", fill="y", pady=10)
         code_text.configure(yscrollcommand=code_scroll.set)
 
-        # Получение кода бота
+        
         bot_code = self.generate_bot_code()
 
-        # Добавление кода в текстовое поле
+        
         code_text.insert(END, bot_code)
-        code_text.config(state="normal")  # Разрешаем выделение текста, но не редактирование
+        code_text.config(state="normal")
 
-        # Создание кнопки "Копировать"
+        
         copy_button = ctk.CTkButton(code_window, text="Копировать",
                                     command=lambda: self.copy_code(code_text.get("1.0", END)))
         copy_button.pack(side="left", padx=10, pady=10)
-         # Создание кнопки "Сохранить как"
+         
         save_button = ctk.CTkButton(code_window, text="Сохранить как", command=lambda: self.save_code(code_text.get("1.0", END)))
         save_button.pack(side="left", padx=10, pady=10)
 
@@ -175,7 +175,7 @@ def parse_markdown(text):
 """
 
         for command, response in self.command_manager.get_commands().items():
-            # Удаляем начальный слэш из команды для определения функции-обработчика
+            
             command_name = command.lstrip('/')
             bot_code += f"""
 @bot.message_handler(commands=['{command_name}'])
@@ -208,14 +208,14 @@ if __name__ == '__main__':
         return bot_code
 
     def remove_code_comments(self, code):
-        # Удаление однострочных комментариев (начинающихся с #)
+        
         code = re.sub(r'#.*', '', code)
-        # Удаление многострочных комментариев (начинающихся с ''' или """)
+        
         code = re.sub(r"(\"\"\"|\'\'\').*?(\"\"\"|\'\'\')", '', code, flags=re.DOTALL)
         return code
 
     def remove_empty_lines(self, code):
-        # Удаление пустых строк
+        
         code = os.linesep.join([line for line in code.splitlines() if line.strip()])
         return code
 
@@ -360,7 +360,7 @@ if __name__ == '__main__':
         ctk.CTkLabel(self.bot_frame, text="Токен бота:").pack(side="left", padx=5)
         self.token_input = ctk.CTkEntry(self.bot_frame, width=300)
         self.token_input.pack(side="left", padx=5, expand=True, fill="x")
-        # Задаем событие для отслеживания изменений
+        
         self.token_input.bind("<FocusOut>", self.update_bot_token)
 
 
@@ -438,7 +438,7 @@ if __name__ == '__main__':
         bot_token = self.token_input.get()
         if bot_token:
             self.bot_token = bot_token
-        self.bot_saved = False # Считаем, что произошли изменения
+        self.bot_saved = False
         try:
             self.bot = telebot.TeleBot(bot_token)
             self.is_running = True
@@ -645,7 +645,7 @@ if __name__ == '__main__':
                 self.bot_token = ""
                 self.token_input.delete(0, ctk.END)
                 self.log_to_console(f"Бот удален {filename}")
-                self.bot_saved = True  # Считаем, что после удаления нет несохраненных изменений
+                self.bot_saved = True
             except FileNotFoundError:
                 messagebox.showerror("Ошибка", "Файл не найден!")
             except OSError as e:
@@ -654,14 +654,14 @@ if __name__ == '__main__':
     def update_bot_token(self, event):
         """Обновляет self.bot_token при изменении поля ввода токена."""
         self.bot_token = self.token_input.get()
-        self.bot_saved = False # Помечаем, что есть несохраненные изменения
+        self.bot_saved = False
 
     def on_close(self):
         self.is_running = False
         if self.bot:
             self.bot.stop_polling()
 
-        if not self.bot_saved:  # Проверка флага bot_saved
+        if not self.bot_saved:
             if messagebox.askyesno("Сохранить?", "Вы не сохранили бота, хотите сохранить?"):
                 self.save_bot()
                 self.log_to_console("Бот сохранен перед выходом")
